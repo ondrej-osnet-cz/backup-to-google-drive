@@ -50,7 +50,8 @@ function getClient()
     return $client;
 }
 
-function UploadFile($name, $parentsId, $filePath, $service) {
+function UploadFile($name, $parentsId, $filePath, $client) {
+    $service = new Google_Service_Drive($client);
     $fileMetadata = new Google_Service_Drive_DriveFile(array(
         'name' => $name,
         'parents' => array($parentsId)
@@ -106,8 +107,6 @@ function UploadFileStream($name, $parentsId, $filePath, $client) {
 // Get the API client and construct the service object.
 $client = getClient();
 
-$service = new Google_Service_Drive($client);
-
 $files = json_decode(file_get_contents('config.json'), true);
 foreach ($files['files'] as $file) {
     $fileSourceDir = $file['sourceFolder'];
@@ -119,7 +118,15 @@ foreach ($files['files'] as $file) {
         $fileAge = filemtime($filePath);
         if ($fileAge > $maxFileAge) {            
             echo 'Upload file: ' . $fileName . ' - ' . $filePath . ' to ' . $file['targetFolderGoogleId'] . "\r\n";
-            if (realUpload) UploadFileStream($fileName, $file['targetFolderGoogleId'], $filePath, $client);            
+            if (realUpload) {
+                $size = filesize($filePath);
+                if ($size > 5 * 1024 * 1024) {
+                    UploadFileStream($fileName, $file['targetFolderGoogleId'], $filePath, $client);            
+                } else {
+                    UploadFile($fileName, $file['targetFolderGoogleId'], $filePath, $client);
+                }
+                
+            }
         }
     }
 }
