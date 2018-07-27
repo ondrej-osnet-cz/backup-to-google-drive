@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
-const debug = true;
+const realUpload = true;
 
 if (php_sapi_name() != 'cli') {
     throw new Exception('This application must be run on the command line.');
@@ -64,9 +64,48 @@ function UploadFile($name, $parentsId, $filePath, $service) {
     return $file->id;     
 }
 
+function UploadFileStream($name, $parentsId, $filePath, $client) {
+    $client->setDefer(true);
+    $service = new Google_Service_Drive($client);
+    $chunkSizeBytes = 20 * 1024 * 1024; // 1MB
+
+    $file = new Google_Service_Drive_DriveFile(array(
+        'name' => $name,
+        'parents' => array($parentsId)
+    ));   
+    $request = $service->files->create($file);
+    $media = new Google_Http_MediaFileUpload(
+        $client,
+        $request,
+        'application/tar+gzip',
+        null,
+        true,
+        $chunkSizeBytes
+    );    
+    $media->setFileSize(filesize($filePath));
+    $status = false;
+    $handle = fopen($filePath, "rb");
+    while (!$status && !feof($handle)) {
+        $chunk = fread($handle, $chunkSizeBytes);
+        $status = $media->nextChunk($chunk);
+    }
+
+    // The final value of $status will be the data from the API for the object
+    // that has been uploaded.
+    $result = false;
+    if($status != false) {
+        $result = $status;
+    }
+
+    fclose($handle);
+    // Reset to the client to execute requests immediately in the future.
+    $client->setDefer(false);
+}
+
 
 // Get the API client and construct the service object.
 $client = getClient();
+
 $service = new Google_Service_Drive($client);
 
 $files = json_decode(file_get_contents('config.json'), true);
@@ -79,8 +118,8 @@ foreach ($files['files'] as $file) {
         $maxFileAge = time() - (60 * 60 * 24) * $file['maxFileAgeInDay'];
         $fileAge = filemtime($filePath);
         if ($fileAge > $maxFileAge) {            
-            echo 'Upload file: ' . $fileName . ' - ' . $filePath . ' to ' . $file['targetFolderGoogleId'];
-            if (!debug) UploadFile($fileName, $file['targetFolderGoogleId'], $filePath, $service);            
+            echo 'Upload file: ' . $fileName . ' - ' . $filePath . ' to ' . $file['targetFolderGoogleId'] . "\r\n";
+            if (realUpload) UploadFileStream($fileName, $file['targetFolderGoogleId'], $filePath, $client);            
         }
     }
 }
