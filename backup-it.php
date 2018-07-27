@@ -116,16 +116,16 @@ foreach ($files['files'] as $file) {
         $filePath = $fileSourceDir . '/' . $fileName;
         $maxFileAge = time() - (60 * 60 * 24) * $file['maxFileAgeInDay'];
         $fileAge = filemtime($filePath);
-        if ($fileAge > $maxFileAge) {            
-            echo 'Upload file: ' . $fileName . ' - ' . $filePath . ' to ' . $file['targetFolderGoogleId'] . "\r\n";
-            if (realUpload) {
+        if ($fileAge > $maxFileAge) {                        
+            if (realUpload) {                
                 $size = filesize($filePath);
                 if ($size > 5 * 1024 * 1024) {
+                    echo 'Stream upload file: ' . $fileName . ' - ' . $filePath . ' to ' . $file['targetFolderGoogleId'] . "\r\n";
                     UploadFileStream($fileName, $file['targetFolderGoogleId'], $filePath, $client);            
                 } else {
+                    echo 'Simple upload file: ' . $fileName . ' - ' . $filePath . ' to ' . $file['targetFolderGoogleId'] . "\r\n";
                     UploadFile($fileName, $file['targetFolderGoogleId'], $filePath, $client);
-                }
-                
+                }                
             }
         }
     }
