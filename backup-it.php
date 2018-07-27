@@ -1,6 +1,8 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
+const debug = true;
+
 if (php_sapi_name() != 'cli') {
     throw new Exception('This application must be run on the command line.');
 }
@@ -68,8 +70,7 @@ $client = getClient();
 $service = new Google_Service_Drive($client);
 
 $files = json_decode(file_get_contents('config.json'), true);
-foreach ($files as $file) {
-    $file = $file[0];
+foreach ($files['files'] as $file) {
     $fileSourceDir = $file['sourceFolder'];
     $filesNames = scandir($fileSourceDir);
     foreach ($filesNames as $fileName) {
@@ -77,8 +78,9 @@ foreach ($files as $file) {
         $filePath = $fileSourceDir . '/' . $fileName;
         $maxFileAge = time() - (60 * 60 * 24) * $file['maxFileAgeInDay'];
         $fileAge = filemtime($filePath);
-        if ($fileAge > $maxFileAge) {
-            UploadFile($fileName, $file['targetFolderGoogleId'], $filePath, $service);
+        if ($fileAge > $maxFileAge) {            
+            echo 'Upload file: ' . $fileName . ' - ' . $filePath . ' to ' . $file['targetFolderGoogleId'];
+            if (!debug) UploadFile($fileName, $file['targetFolderGoogleId'], $filePath, $service);            
         }
     }
 }
