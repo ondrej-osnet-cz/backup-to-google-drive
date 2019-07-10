@@ -21,7 +21,7 @@ export class CompressService {
 
     for (const file of allFiles) {
         const filePath = path.join(this.settings.getSourceFolder(), file);
-        const stats = fs.lstatSync(filePath);
+        // const stats = fs.lstatSync(filePath);
         // if (!stats.isDirectory()) continue;
         const targetArchive = `${path.join(this.settings.getTargetFolder(), file)}.7zip`;
         this.log.log(`Compressig directory ${filePath} to ${targetArchive}`);
