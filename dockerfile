@@ -38,6 +38,7 @@ COPY ./app.config.json /home/node/app/dist/app.config.json
 COPY ./package.json /home/node/app/package.json
 
 RUN mkdir /home/node/data
+RUN mkdir /home/node/secret
 
 WORKDIR /home/node/app/dist
 
