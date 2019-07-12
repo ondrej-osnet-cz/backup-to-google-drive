@@ -1,5 +1,8 @@
 {
     "target_folder": "/home/dev/Documents/webtemplate",
     "source_folder": "/home/dev/backup",
-    "googleIdsFile": "/home/dev/client_secret.json"
+    "googleIdsFile": "/home/dev/client_secret.json",
+    "pathToGoogleTokens": "/home/dev/token_secret.json",
+    "tempCompressFilesFolder": "/home/dev/",
+    "targetFolderName": "backup"
 }

@@ -23,7 +23,7 @@ export class CompressService {
         const filePath = path.join(this.settings.getSourceFolder(), file);
         // const stats = fs.lstatSync(filePath);
         // if (!stats.isDirectory()) continue;
-        const targetArchive = `${path.join(this.settings.getTargetFolder(), file)}.7zip`;
+        const targetArchive = `${path.join(this.settings.getTempCompressFilesFolder(), file)}.7zip`;
         this.log.log(`Compressig directory ${filePath} to ${targetArchive}`);
         const command = `7z a ${targetArchive} ${filePath}/* -mx=7`;
         this.log.log('Executing command: ' + command);

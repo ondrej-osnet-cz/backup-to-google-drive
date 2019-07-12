@@ -26,5 +26,6 @@ async function bootstrap() {
   compressor.compressDirectories();
 
   
+  
 }
 bootstrap();

@@ -13,16 +13,22 @@ export class SettingsService {
 
     private googleTokens: GoogleTokens;
 
+    private tempCompressFilesFolder: string;
+
+    private targetFolderName: string;
+
     constructor(pathToConfig: string) {
         const configString = fs.readFileSync(pathToConfig, 'utf8');
         const configData = JSON.parse(configString);
-        this.sourceFolder = process.env.sourceFolder || configData.source_folder;
+        this.sourceFolder = process.env.SOURCE_FOLDER || configData.source_folder;
         
-        const pathToGoogleIds = process.env.googleIdsFile || configData.googleIdsFile;
+        const pathToGoogleIds = process.env.GOOGLE_IDS_FILE || configData.googleIdsFile;
         const googleIdsStringData = fs.readFileSync(pathToGoogleIds, 'utf8');
         this.googleAppIdsData = JSON.parse(googleIdsStringData);
         
-        if (configData.pathToGoogleTokens) this.pathToGoogleTokens = configData.pathToGoogleTokens;
+        this.pathToGoogleTokens = process.env.PATH_TO_GOOGLE_TOKENS || configData.pathToGoogleTokens;
+        this.tempCompressFilesFolder = process.env.PATH_TEMP_COMPRESS_FILE_FILDER || configData.pathToGoogleTokens;
+        this.targetFolderName = process.env.TARGET_FOLDER_NAME || configData.targetFolderName;
 
         if (this.isGoogleTokensSetup()) {
             this.googleTokens = JSON.parse(fs.readFileSync(this.pathToGoogleTokens, 'utf8'));
@@ -33,9 +39,13 @@ export class SettingsService {
         return this.sourceFolder;
     }
 
-    public getTargetFolder() {
-        return '/home/node/data';
+    public getTempCompressFilesFolder() {
+        return this.tempCompressFilesFolder;
     }    
+
+    public getTargetFolderName() {
+        this.targetFolderName;
+    }
 
     public getGoogleAppIdsData() {
         return this.googleAppIdsData;        
@@ -50,7 +60,7 @@ export class SettingsService {
     }
 
     public saveGoogleTokens(tokens: GoogleTokens) {
-        const dataClean = {access_token: tokens.access_token, refresh_token: tokens.refresh_token};
+        const dataClean = {access_token: tokens.access_token, refresh_token: tokens.refresh_token, expires_in: tokens.expires_in, token_type: tokens.token_type};
         fs.writeFileSync(this.pathToGoogleTokens, JSON.stringify(dataClean));
     }
 }
@@ -60,6 +70,10 @@ export interface GoogleTokens {
     access_token: string;
 
     refresh_token: string;
+
+    expires_in: number;
+
+    token_type: string;
 
 }
 
