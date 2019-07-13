@@ -4,6 +4,7 @@ import { LoggerService } from '../logger/logger.service';
 import * as fs from 'fs';
 import * as util from 'util';
 import * as path from 'path';
+import * as child_process from 'child_process';
 
 @Injectable()
 export class CompressService {
@@ -23,15 +24,25 @@ export class CompressService {
         const filePath = path.join(this.settings.getSourceFolder(), file);
         // const stats = fs.lstatSync(filePath);
         // if (!stats.isDirectory()) continue;
-        const targetArchive = `${path.join(this.settings.getTempCompressFilesFolder(), file)}.7zip`;
+        const targetArchive = `${path.join(this.settings.getTempCompressFilesFolder(), file)}.7z`;
         this.log.log(`Compressig directory ${filePath} to ${targetArchive}`);
-        const command = `7z a ${targetArchive} ${filePath}/* -mx=7`;
+        const command = `7z a ${targetArchive} ${filePath}/* -mx=7 -aoa`;
         this.log.log('Executing command: ' + command);
-        const { stdout, stderr }  = await exec(command);
-        if (stdout) this.log.log(stdout);
-        if (stderr) this.log.error(stderr);
+        try {
+          await this.execCommand(command);
+        } catch (err) {
+          this.log.error(err);
+        }        
     }
     this.log.log('Copression is done.');
   }
 
+  async execCommand(cmd: string) {
+    return new Promise((resolve, reject) => {
+      const runningProc = child_process.exec(cmd);
+      runningProc.stdout.on('data', (data) => this.log.log(data));
+      runningProc.stderr.on('data', (data) => reject(data));
+      runningProc.on('exit', () => resolve());
+    });
+  }
 }

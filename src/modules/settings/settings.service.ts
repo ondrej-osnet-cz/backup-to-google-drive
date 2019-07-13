@@ -27,7 +27,7 @@ export class SettingsService {
         this.googleAppIdsData = JSON.parse(googleIdsStringData);
         
         this.pathToGoogleTokens = process.env.PATH_TO_GOOGLE_TOKENS || configData.pathToGoogleTokens;
-        this.tempCompressFilesFolder = process.env.PATH_TEMP_COMPRESS_FILE_FILDER || configData.pathToGoogleTokens;
+        this.tempCompressFilesFolder = process.env.PATH_TEMP_COMPRESS_FILE_FILDER || configData.tempCompressFilesFolder;
         this.targetFolderName = process.env.TARGET_FOLDER_NAME || configData.targetFolderName;
 
         if (this.isGoogleTokensSetup()) {
@@ -44,7 +44,7 @@ export class SettingsService {
     }    
 
     public getTargetFolderName() {
-        this.targetFolderName;
+        return this.targetFolderName;
     }
 
     public getGoogleAppIdsData() {

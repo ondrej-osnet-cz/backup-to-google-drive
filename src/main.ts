@@ -4,6 +4,7 @@ import { CompressService } from './modules/compress/compress.service';
 import { GoogleAuthService } from './modules/google-auth/google-auth.service';
 import { SettingsService } from './modules/settings/settings.service';
 import { LoggerService } from './modules/logger/logger.service';
+import { UploadService } from './modules/upload/upload.service';
 
 async function bootstrap() {  
   const app = await NestFactory.create(AppModule);
@@ -23,9 +24,10 @@ async function bootstrap() {
   }
 
   const compressor = app.get(CompressService);
-  compressor.compressDirectories();
+  //await compressor.compressDirectories();
 
-  
+  const uploader = app.get(UploadService);
+  await uploader.uploadAllFilesTooGogole();
   
 }
 bootstrap();

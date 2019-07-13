@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { SettingsService } from '../settings/settings.service';
 import { LoggerService } from '../logger/logger.service';
-import { google } from 'googleapis';
+import { google, drive_v3 } from 'googleapis';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class UploadService {
@@ -13,11 +15,57 @@ export class UploadService {
     const client = await this.getGoogleClient();
     const drive = google.drive({version: 'v3', auth: client});
 
-    const targetFilesMatch = await drive.files.list({q: `mimeType='application/vnd.google-apps.folder and name='${this.settings.getTargetFolderName()}'`, spaces: 'drive', fields: 'nextPageToken, files(id, name)'});
-    if (targetFilesMatch.data.files.length === 0) {
-      const createdFile = drive.files.create();
+    let rootBackupFolder = await this.getFolder(drive, this.settings.getTargetFolderName());
+    if (!rootBackupFolder) {
+      rootBackupFolder = await this.createFolder(drive, this.settings.getTargetFolderName());
+    }
+
+    const files = fs.readdirSync(this.settings.getTempCompressFilesFolder());
+    for (const file of files) {
+
     }
   }
+
+  async createFolder(drive: drive_v3.Drive, folderName: string, parentId?: string) {
+    const fileMetadata: drive_v3.Schema$File = {
+      name: folderName,
+      mimeType: 'application/vnd.google-apps.folder',
+      parents: parentId ? [parentId] : []
+    };
+    const createdFile = await drive.files.create({
+      requestBody: fileMetadata,
+      fields: 'id, name'
+    });
+
+    return createdFile.data;
+  }
+
+  async uploadFile(drive: drive_v3.Drive, sourcePathToFile: string, targetFolderId: string, targetFileName: string) {
+    const fileMetadata: drive_v3.Schema$File = {
+      name: targetFileName,
+      mimeType: 'application/x-7z-compressed',
+      parents: [targetFolderId],
+    };
+    const media = {
+      resumable: true,
+      body: fs.createReadStream(sourcePathToFile)
+    };
+    drive.files.update()
+    const createdFile = await drive.files.create({
+      requestBody: fileMetadata,
+      media: media,
+      fields: 'id, name'
+    });
+    return createdFile.data;
+  }
+
+  async getFolder(drive: drive_v3.Drive, folderName: string, parentId?: string) {
+    const parenstParam = parentId || 'root';
+    let query = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parenstParam}' in parents`;    
+    const folder = await drive.files.list({q: query, spaces: 'drive', fields: 'files(id, name)'});
+    if (folder.data.files.length > 0) return folder.data.files[0];
+    return null;
+  }  
 
   async getGoogleClient() {
     const googleData = this.settings.getGoogleAppIdsData().installed;
