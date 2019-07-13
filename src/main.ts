@@ -24,7 +24,7 @@ async function bootstrap() {
   }
 
   const compressor = app.get(CompressService);
-  //await compressor.compressDirectories();
+  await compressor.compressDirectories();
 
   const uploader = app.get(UploadService);
   await uploader.uploadAllFilesTooGogole();

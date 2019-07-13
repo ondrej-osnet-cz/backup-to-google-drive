@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, MethodNotAllowedException } from '@nestjs/common';
 import { SettingsService } from '../settings/settings.service';
 import { LoggerService } from '../logger/logger.service';
 import { google, drive_v3 } from 'googleapis';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as moment from 'moment'
 
 @Injectable()
 export class UploadService {
@@ -22,7 +23,15 @@ export class UploadService {
 
     const files = fs.readdirSync(this.settings.getTempCompressFilesFolder());
     for (const file of files) {
-
+      const folderName = file.substr(0, file.length - 3); // always end with .7z
+      let folder = await this.getFolder(drive, folderName, rootBackupFolder.id);
+      if (!folder) {
+        folder = await this.createFolder(drive, folderName, rootBackupFolder.id);
+      }
+      const sourcePath = path.join(this.settings.getTempCompressFilesFolder(), file);
+      const now = moment(new Date());
+      const fileName = folderName + '_' + now.format('MM_DD_YYYY-hh_mm_ss') + '.7z';
+      await this.uploadFile(drive, sourcePath, folder.id, fileName);
     }
   }
 
@@ -50,7 +59,6 @@ export class UploadService {
       resumable: true,
       body: fs.createReadStream(sourcePathToFile)
     };
-    drive.files.update()
     const createdFile = await drive.files.create({
       requestBody: fileMetadata,
       media: media,
@@ -61,7 +69,7 @@ export class UploadService {
 
   async getFolder(drive: drive_v3.Drive, folderName: string, parentId?: string) {
     const parenstParam = parentId || 'root';
-    let query = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parenstParam}' in parents`;    
+    let query = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parenstParam}' in parents and trashed=false`;    
     const folder = await drive.files.list({q: query, spaces: 'drive', fields: 'files(id, name)'});
     if (folder.data.files.length > 0) return folder.data.files[0];
     return null;

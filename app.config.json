@@ -2,6 +2,6 @@
     "source_folder": "/home/dev/backup",
     "googleIdsFile": "/home/dev/client_secret.json",
     "pathToGoogleTokens": "/home/dev/token_secret.json",
-    "tempCompressFilesFolder": "/home/dev/",
+    "tempCompressFilesFolder": "/home/dev/temp_compress",
     "targetFolderName": "backup"
 }
