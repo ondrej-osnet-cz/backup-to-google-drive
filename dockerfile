@@ -40,8 +40,11 @@ COPY ./package.json /home/node/app/package.json
 RUN mkdir /home/node/data
 RUN mkdir /home/node/secret
 
-ENV PATH_TO_GOOGLE_TOKENS=/home/node/secret/googleTokens.json
+ENV SOURCE_FOLDER=/home/node/backup
+ENV GOOGLE_IDS_FILE=/home/node/secret/client_secret.json
+ENV PATH_TO_GOOGLE_TOKENS=/home/node/secret/token_secret.json
 ENV PATH_TEMP_COMPRESS_FILE_FILDER=/home/node/temp
+ENV TARGET_FOLDER_NAME=server_backup
 ENV NODE_ENV=production
 
 WORKDIR /home/node/app/dist

@@ -25,7 +25,6 @@
     "@nestjs/platform-express": "^6.0.0",
     "googleapis": "^40.0.1",
     "moment": "^2.24.0",
-    "node-7z": "^1.1.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3"
