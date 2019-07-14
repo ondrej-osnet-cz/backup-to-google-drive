@@ -13,26 +13,33 @@ export class UploadService {
   }
 
   async uploadAllFilesTooGogole() {
+    this.log.log('Uploadong files to Google Drive');
     const client = await this.getGoogleClient();
     const drive = google.drive({version: 'v3', auth: client});
 
     let rootBackupFolder = await this.getFolder(drive, this.settings.getTargetFolderName());
     if (!rootBackupFolder) {
+      this.log.log(`Folder ${this.settings.getTargetFolderName()} does not exist. Creating new one.`);
       rootBackupFolder = await this.createFolder(drive, this.settings.getTargetFolderName());
     }
 
     const files = fs.readdirSync(this.settings.getTempCompressFilesFolder());
     for (const file of files) {
+      this.log.log(`Uploading file ${file}`);
       const folderName = file.substr(0, file.length - 3); // always end with .7z
       let folder = await this.getFolder(drive, folderName, rootBackupFolder.id);
       if (!folder) {
+        this.log.log(`Folder ${this.settings.getTargetFolderName()}/${folder} does not exist. Creating new one.`);
         folder = await this.createFolder(drive, folderName, rootBackupFolder.id);
       }
       const sourcePath = path.join(this.settings.getTempCompressFilesFolder(), file);
       const now = moment(new Date());
-      const fileName = folderName + '_' + now.format('MM_DD_YYYY-hh_mm_ss') + '.7z';
+      const fileName = folderName + '_' + now.format('DD_MM_YYYY-hh_mm_ss') + '.7z';
+      this.log.log(`Uploading file ${fileName}`);
       await this.uploadFile(drive, sourcePath, folder.id, fileName);
+      this.log.log(`File is uploaded ${fileName}`);
     }
+    this.log.log('files uploaded successfully');
   }
 
   async createFolder(drive: drive_v3.Drive, folderName: string, parentId?: string) {

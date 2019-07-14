@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { SettingsService } from '../settings/settings.service';
 import { LoggerService } from '../logger/logger.service';
 import * as fs from 'fs';
@@ -17,7 +17,14 @@ export class CompressService {
     this.log.log(`Compress all in ${this.settings.getSourceFolder()}`);
     const allFiles = fs.readdirSync(this.settings.getSourceFolder());
     this.log.log(`This files found: ${allFiles.join(' ,')}`);
-    fs.unlinkSync(this.settings.getTempCompressFilesFolder() + '/*');
+
+    this.log.log('Deleting temp directory');
+    const allTepmsFile = fs.readdirSync(this.settings.getTempCompressFilesFolder());
+    for (const temp of allTepmsFile) {
+      const filePath = path.join(this.settings.getTempCompressFilesFolder(), temp);
+      this.log.log('Deleting temp file: ' + filePath);
+      fs.unlinkSync(filePath);
+    }
 
     for (const file of allFiles) {
         const filePath = path.join(this.settings.getSourceFolder(), file);

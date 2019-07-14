@@ -39,6 +39,7 @@ COPY ./package.json /home/node/app/package.json
 
 RUN mkdir /home/node/data
 RUN mkdir /home/node/secret
+RUN mkdir /home/node/temp
 
 ENV SOURCE_FOLDER=/home/node/backup
 ENV GOOGLE_IDS_FILE=/home/node/secret/client_secret.json
