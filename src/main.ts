@@ -16,6 +16,7 @@ async function bootstrap() {
     try {
       const authResp = await googleAuth.getClientAuthUrl();
       setting.saveGoogleTokens(authResp);
+      setting.reloadSettings();
     } catch (err) {
       const logger = app.get(LoggerService);
       logger.error(err);

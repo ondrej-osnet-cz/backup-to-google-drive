@@ -5,11 +5,12 @@ import { google, drive_v3 } from 'googleapis';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as moment from 'moment'
+import { CompressorBase } from '../compress/compress.service';
 
 @Injectable()
 export class UploadService {
   
-  constructor(private settings: SettingsService, private log: LoggerService) {
+  constructor(private settings: SettingsService, private log: LoggerService, private compress: CompressorBase) {
   }
 
   async uploadAllFilesTooGogole() {
@@ -26,15 +27,15 @@ export class UploadService {
     const files = fs.readdirSync(this.settings.getTempCompressFilesFolder());
     for (const file of files) {
       this.log.log(`Uploading file ${file}`);
-      const folderName = file.substr(0, file.length - 3); // always end with .7z
+      const folderName = file.substr(0, file.length - (this.compress.getSuffix().length + 1)); // .7z = 3, .tar.gz2 = 8
       let folder = await this.getFolder(drive, folderName, rootBackupFolder.id);
       if (!folder) {
-        this.log.log(`Folder ${this.settings.getTargetFolderName()}/${folder} does not exist. Creating new one.`);
+        this.log.log(`Folder ${this.settings.getTargetFolderName()}/${folderName} does not exist. Creating new one.`);
         folder = await this.createFolder(drive, folderName, rootBackupFolder.id);
       }
       const sourcePath = path.join(this.settings.getTempCompressFilesFolder(), file);
       const now = moment(new Date());
-      const fileName = folderName + '_' + now.format('DD_MM_YYYY-hh_mm_ss') + '.7z';
+      const fileName = folderName + '_' + now.format('DD_MM_YYYY-hh_mm_ss') + '.' + this.compress.getSuffix();
       this.log.log(`Uploading file ${fileName}`);
       await this.uploadFile(drive, sourcePath, folder.id, fileName);
       this.log.log(`File is uploaded ${fileName}`);

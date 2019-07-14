@@ -5,7 +5,7 @@ import * as fs from 'fs';
 @Injectable()
 export class SettingsService {
 
-    private readonly pathToGoogleTokens = '/home/node/secret/googleTokens.json';
+    private pathToGoogleTokens: string;
 
     private sourceFolder: string;
 
@@ -17,22 +17,10 @@ export class SettingsService {
 
     private targetFolderName: string;
 
-    constructor(pathToConfig: string) {
-        const configString = fs.readFileSync(pathToConfig, 'utf8');
-        const configData = JSON.parse(configString);
-        this.sourceFolder = process.env.SOURCE_FOLDER || configData.source_folder;
-        
-        const pathToGoogleIds = process.env.GOOGLE_IDS_FILE || configData.googleIdsFile;
-        const googleIdsStringData = fs.readFileSync(pathToGoogleIds, 'utf8');
-        this.googleAppIdsData = JSON.parse(googleIdsStringData);
-        
-        this.pathToGoogleTokens = process.env.PATH_TO_GOOGLE_TOKENS || configData.pathToGoogleTokens;
-        this.tempCompressFilesFolder = process.env.PATH_TEMP_COMPRESS_FILE_FILDER || configData.tempCompressFilesFolder;
-        this.targetFolderName = process.env.TARGET_FOLDER_NAME || configData.targetFolderName;
+    private compressType: CompressionType;
 
-        if (this.isGoogleTokensSetup()) {
-            this.googleTokens = JSON.parse(fs.readFileSync(this.pathToGoogleTokens, 'utf8'));
-        }
+    constructor(private pathToConfig: string) {
+        this.loadSettings();
     }
 
     public getSourceFolder() {
@@ -59,9 +47,37 @@ export class SettingsService {
         return this.googleTokens;
     }
 
+    public getCompressType() {
+        return this.compressType;
+    }
+
     public saveGoogleTokens(tokens: GoogleTokens) {
         const dataClean = {access_token: tokens.access_token, refresh_token: tokens.refresh_token, expires_in: tokens.expires_in, token_type: tokens.token_type};
         fs.writeFileSync(this.pathToGoogleTokens, JSON.stringify(dataClean));
+    }
+
+    public reloadSettings() {
+        this.loadSettings();
+    }
+
+
+    private loadSettings() {
+        const configString = fs.readFileSync(this.pathToConfig, 'utf8');
+        const configData = JSON.parse(configString);
+        this.sourceFolder = process.env.SOURCE_FOLDER || configData.source_folder;
+        
+        const pathToGoogleIds = process.env.GOOGLE_IDS_FILE || configData.googleIdsFile;
+        const googleIdsStringData = fs.readFileSync(pathToGoogleIds, 'utf8');
+        this.googleAppIdsData = JSON.parse(googleIdsStringData);
+        
+        this.pathToGoogleTokens = process.env.PATH_TO_GOOGLE_TOKENS || configData.pathToGoogleTokens;
+        this.tempCompressFilesFolder = process.env.PATH_TEMP_COMPRESS_FILE_FILDER || configData.tempCompressFilesFolder;
+        this.targetFolderName = process.env.TARGET_FOLDER_NAME || configData.targetFolderName;
+        this.compressType = process.env.COMPRESS_TYPE || configData.compressType;
+
+        if (this.isGoogleTokensSetup()) {
+            this.googleTokens = JSON.parse(fs.readFileSync(this.pathToGoogleTokens, 'utf8'));
+        }
     }
 }
 
@@ -89,4 +105,9 @@ export interface GoogleAppIdsData {
         redirect_uris: string[];
     }
 
+}
+
+export enum CompressionType {
+    ZIP7='7ZIP',
+    TARBZ2='TARBZ2'
 }

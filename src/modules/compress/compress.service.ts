@@ -1,15 +1,23 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SettingsService } from '../settings/settings.service';
 import { LoggerService } from '../logger/logger.service';
 import * as fs from 'fs';
-import * as util from 'util';
 import * as path from 'path';
 import * as child_process from 'child_process';
 
 @Injectable()
+export abstract class CompressorBase {
+
+  abstract compress(sourcePath: string, destinationPath: string);
+
+  abstract getSuffix();
+
+}
+
+@Injectable()
 export class CompressService {
 
-  constructor(private settings: SettingsService, private log: LoggerService) {
+  constructor(private settings: SettingsService, private log: LoggerService, private compressor: CompressorBase) {
   }
 
   async compressDirectories() {
@@ -27,17 +35,14 @@ export class CompressService {
     }
 
     for (const file of allFiles) {
-        const filePath = path.join(this.settings.getSourceFolder(), file);
+        const sourcePath = path.join(this.settings.getSourceFolder(), file);
+        const destinationPath = path.join(this.settings.getTempCompressFilesFolder(), file)
         // const stats = fs.lstatSync(filePath);
-        // if (!stats.isDirectory()) continue;
-        const targetArchive = `${path.join(this.settings.getTempCompressFilesFolder(), file)}.7z`;
-        this.log.log(`Compressig directory ${filePath} to ${targetArchive}`);
-        const command = `7z a ${targetArchive} ${filePath}/* -aoa -mx=7`;
-        this.log.log('Executing command: ' + command);
+        // if (!stats.isDirectory()) continue;        
         try {
-          this.execCommand(command);
+          this.compressor.compress(sourcePath, destinationPath);
         } catch (err) {
-          this.log.error(err);
+          this.log.error(err);          
         }        
     }
     this.log.log('Copression is done.');

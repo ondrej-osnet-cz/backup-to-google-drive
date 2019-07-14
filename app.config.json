@@ -3,5 +3,6 @@
     "googleIdsFile": "/home/dev/client_secret.json",
     "pathToGoogleTokens": "/home/dev/token_secret.json",
     "tempCompressFilesFolder": "/home/dev/temp_compress",
-    "targetFolderName": "backup"
+    "targetFolderName": "backup",
+    "compressType": "TARBZ2"
 }

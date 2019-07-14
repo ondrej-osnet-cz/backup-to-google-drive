@@ -29,7 +29,8 @@ RUN npm install --production
 # runtime
 FROM alpine:3.10.0 as runtime
 
-RUN apk add --update p7zip
+#RUN apk add --update p7zip
+RUN apk add --update tar
 RUN apk add --update nodejs
 
 COPY --from=builder /home/node/app/dist /home/node/app/dist
@@ -46,6 +47,7 @@ ENV GOOGLE_IDS_FILE=/home/node/secret/client_secret.json
 ENV PATH_TO_GOOGLE_TOKENS=/home/node/secret/token_secret.json
 ENV PATH_TEMP_COMPRESS_FILE_FILDER=/home/node/temp
 ENV TARGET_FOLDER_NAME=server_backup
+ENV COMPRESS_TYPE=TARBZ2
 ENV NODE_ENV=production
 
 WORKDIR /home/node/app/dist
