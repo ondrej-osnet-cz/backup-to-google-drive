@@ -1,1 +1,0 @@
-docker run -v /home/dev/client_secret.json:/home/node/secret/client_secret.json -v /home/dev/Documents/distribution:/home/backup/distribution -v /home/dev/Documents/webroot:/home/backup/webroot -v /home/dev/Documents/webtemplate:/home/backup/webtemplate backup-to-google-drive
