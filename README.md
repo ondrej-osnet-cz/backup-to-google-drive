@@ -21,7 +21,7 @@ This is a minimum config of the image. The image needs 3 volumes:
 
 The first-time run container asks you for Google permission in the command line. It is simple. Just copy the URL to your browser, log in to your Google Account and write a given code. Then your files will be compressed and uploaded to Google Drive.
 
-## Advance usages of Docker image
+## Advanced usages of Docker image
 // TODO
 
 ## Use this software at your own risk!!!
