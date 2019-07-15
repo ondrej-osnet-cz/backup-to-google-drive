@@ -27,6 +27,7 @@ WORKDIR /home/node/app
 RUN npm install --production
 
 # runtime
+# 7zip
 FROM alpine:3.10.0 as p7zip
 
 RUN apk add --update p7zip
@@ -53,7 +54,7 @@ WORKDIR /home/node/app/dist
 
 CMD node main.js
 
-
+# tar
 FROM alpine:3.10.0 as tar
 
 RUN apk add --update tar
