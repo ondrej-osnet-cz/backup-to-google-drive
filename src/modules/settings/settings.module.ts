@@ -7,8 +7,8 @@ import { SettingsService } from './settings.service';
     {
       provide: SettingsService,
       useValue: new SettingsService('app.config.json'),
-    }
+    },
   ],
-  exports: [SettingsService]
+  exports: [SettingsService],
 })
 export class SettingsModule {}

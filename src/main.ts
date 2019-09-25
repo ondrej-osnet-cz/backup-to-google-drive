@@ -6,7 +6,7 @@ import { SettingsService } from './modules/settings/settings.service';
 import { LoggerService } from './modules/logger/logger.service';
 import { UploadService } from './modules/upload/upload.service';
 
-async function bootstrap() {  
+async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const setting = app.get(SettingsService);
@@ -21,14 +21,13 @@ async function bootstrap() {
       const logger = app.get(LoggerService);
       logger.error(err);
       return;
-    }    
+    }
   }
 
   const compressor = app.get(CompressService);
   await compressor.compressDirectories();
 
   const uploader = app.get(UploadService);
-  await uploader.uploadAllFilesTooGogole();
-  
+  await uploader.uploadAllFilesToGogole();
 }
 bootstrap();

@@ -1,10 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { LoggerService } from "../logger/logger.service";
+import { Injectable } from '@nestjs/common';
+import { LoggerService } from '../logger/logger.service';
 import * as child_process from 'child_process';
-import { CompressorBase } from "./compress.service";
+import { CompressorBase } from './compress.service';
 
 export class Compressor7zipService extends CompressorBase {
-    
+
     constructor(private log: LoggerService) {
         super();
     }

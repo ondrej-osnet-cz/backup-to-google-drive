@@ -23,9 +23,9 @@ import { LoggerService } from '../logger/logger.service';
             throw new Error(`Unknow compression type: ${settings.getCompressType()}`);
         }
       },
-      inject: [SettingsService, LoggerService]
-    }
+      inject: [SettingsService, LoggerService],
+    },
   ],
-  exports: [CompressorBase]
+  exports: [CompressorBase],
 })
 export class CompressModule {}

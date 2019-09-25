@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 
-
 @Injectable()
 export class SettingsService {
 
@@ -29,14 +28,14 @@ export class SettingsService {
 
     public getTempCompressFilesFolder() {
         return this.tempCompressFilesFolder;
-    }    
+    }
 
     public getTargetFolderName() {
         return this.targetFolderName;
     }
 
     public getGoogleAppIdsData() {
-        return this.googleAppIdsData;        
+        return this.googleAppIdsData;
     }
 
     public isGoogleTokensSetup() {
@@ -52,7 +51,9 @@ export class SettingsService {
     }
 
     public saveGoogleTokens(tokens: GoogleTokens) {
-        const dataClean = {access_token: tokens.access_token, refresh_token: tokens.refresh_token, expires_in: tokens.expires_in, token_type: tokens.token_type};
+        const dataClean = {
+            access_token: tokens.access_token, refresh_token: tokens.refresh_token, expires_in: tokens.expires_in, token_type: tokens.token_type,
+        };
         fs.writeFileSync(this.pathToGoogleTokens, JSON.stringify(dataClean));
     }
 
@@ -60,16 +61,15 @@ export class SettingsService {
         this.loadSettings();
     }
 
-
     private loadSettings() {
         const configString = fs.readFileSync(this.pathToConfig, 'utf8');
         const configData = JSON.parse(configString);
         this.sourceFolder = process.env.SOURCE_FOLDER || configData.source_folder;
-        
+
         const pathToGoogleIds = process.env.GOOGLE_IDS_FILE || configData.googleIdsFile;
         const googleIdsStringData = fs.readFileSync(pathToGoogleIds, 'utf8');
         this.googleAppIdsData = JSON.parse(googleIdsStringData);
-        
+
         this.pathToGoogleTokens = process.env.PATH_TO_GOOGLE_TOKENS || configData.pathToGoogleTokens;
         this.tempCompressFilesFolder = process.env.PATH_TEMP_COMPRESS_FILE_FILDER || configData.tempCompressFilesFolder;
         this.targetFolderName = process.env.TARGET_FOLDER_NAME || configData.targetFolderName;
@@ -82,7 +82,7 @@ export class SettingsService {
 }
 
 export interface GoogleTokens {
-    
+
     access_token: string;
 
     refresh_token: string;
@@ -98,16 +98,16 @@ export interface GoogleAppIdsData {
     installed: {
         client_id: string;
         project_id: string;
-        auth_uri: string; 
+        auth_uri: string;
         token_uri: string;
         auth_provider_x509_cert_url: string;
         client_secret: string;
         redirect_uris: string[];
-    }
+    };
 
 }
 
 export enum CompressionType {
-    ZIP7='7ZIP',
-    TARBZ2='TARBZ2'
+    ZIP7 = '7ZIP',
+    TARBZ2 = 'TARBZ2',
 }

@@ -6,6 +6,6 @@ import { LoggerModule } from '../logger/logger.module';
 @Module({
   imports: [ HttpModule, SettingsModule, LoggerModule ],
   providers: [ GoogleAuthService ],
-  exports: [ GoogleAuthService ]
+  exports: [ GoogleAuthService ],
 })
 export class GoogleAuthModule {}

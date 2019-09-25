@@ -1,6 +1,6 @@
-import { Injectable, LoggerService } from "@nestjs/common";
+import { Injectable, LoggerService } from '@nestjs/common';
 import * as child_process from 'child_process';
-import { CompressorBase } from "./compress.service";
+import { CompressorBase } from './compress.service';
 
 export class CompressorTarBz2Service extends CompressorBase  {
 

@@ -36,14 +36,14 @@ export class CompressService {
 
     for (const file of allFiles) {
         const sourcePath = path.join(this.settings.getSourceFolder(), file);
-        const destinationPath = path.join(this.settings.getTempCompressFilesFolder(), file)
+        const destinationPath = path.join(this.settings.getTempCompressFilesFolder(), file);
         // const stats = fs.lstatSync(filePath);
-        // if (!stats.isDirectory()) continue;        
+        // if (!stats.isDirectory()) continue;
         try {
           this.compressor.compress(sourcePath, destinationPath);
         } catch (err) {
-          this.log.error(err);          
-        }        
+          this.log.error(err);
+        }
     }
     this.log.log('Copression is done.');
   }

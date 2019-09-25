@@ -4,16 +4,16 @@ import { LoggerService } from '../logger/logger.service';
 import { google, drive_v3 } from 'googleapis';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as moment from 'moment'
+import * as moment from 'moment';
 import { CompressorBase } from '../compress/compress.service';
 
 @Injectable()
 export class UploadService {
-  
+
   constructor(private settings: SettingsService, private log: LoggerService, private compress: CompressorBase) {
   }
 
-  async uploadAllFilesTooGogole() {
+  async uploadAllFilesToGogole() {
     this.log.log('Uploadong files to Google Drive');
     const client = await this.getGoogleClient();
     const drive = google.drive({version: 'v3', auth: client});
@@ -47,11 +47,11 @@ export class UploadService {
     const fileMetadata: drive_v3.Schema$File = {
       name: folderName,
       mimeType: 'application/vnd.google-apps.folder',
-      parents: parentId ? [parentId] : []
+      parents: parentId ? [parentId] : [],
     };
     const createdFile = await drive.files.create({
       requestBody: fileMetadata,
-      fields: 'id, name'
+      fields: 'id, name',
     });
 
     return createdFile.data;
@@ -65,30 +65,37 @@ export class UploadService {
     };
     const media = {
       resumable: true,
-      body: fs.createReadStream(sourcePathToFile)
+      body: fs.createReadStream(sourcePathToFile),
     };
     const createdFile = await drive.files.create({
       requestBody: fileMetadata,
-      media: media,
-      fields: 'id, name'
+      media,
+      fields: 'id, name',
     });
     return createdFile.data;
   }
 
   async getFolder(drive: drive_v3.Drive, folderName: string, parentId?: string) {
     const parenstParam = parentId || 'root';
-    let query = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parenstParam}' in parents and trashed=false`;    
+    const query = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parenstParam}' in parents and trashed=false`;
     const folder = await drive.files.list({q: query, spaces: 'drive', fields: 'files(id, name)'});
-    if (folder.data.files.length > 0) return folder.data.files[0];
+    if (folder.data.files.length > 0) {
+      return folder.data.files[0];
+    }
     return null;
-  }  
+  }
 
   async getGoogleClient() {
     const googleData = this.settings.getGoogleAppIdsData().installed;
     const client = new google.auth.OAuth2(googleData.client_id, googleData.client_secret, googleData.redirect_uris[0]);
     const googleTokens = this.settings.getGoogleTokens();
-    
-    client.setCredentials({access_token: googleTokens.access_token, refresh_token: googleTokens.refresh_token, token_type: googleTokens.token_type, expiry_date: googleTokens.expires_in});
+
+    client.setCredentials({
+      access_token: googleTokens.access_token,
+      refresh_token: googleTokens.refresh_token,
+      token_type: googleTokens.token_type,
+      expiry_date: googleTokens.expires_in,
+    });
     return client;
   }
 
