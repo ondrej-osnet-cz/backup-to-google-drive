@@ -1,8 +1,8 @@
 {
-    "source_folder": "/home/dev/backup",
-    "googleIdsFile": "/home/dev/client_secret.json",
-    "pathToGoogleTokens": "/home/dev/token_secret.json",
-    "tempCompressFilesFolder": "/home/dev/temp_compress",
+    "source_folder": "./temp/backup",
+    "googleIdsFile": "./temp/secret/credentials.json",
+    "pathToGoogleTokens": "./temp/secret/token_secret.json",
+    "tempCompressFilesFolder": "./temp",
     "targetFolderName": "backup",
     "compressType": "TARBZ2"
 }

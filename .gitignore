@@ -32,3 +32,8 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+/temp/backup/*
+!/temp/backup/.gitkeep
+/temp/secret/*
+!/temp/secret/.gitkeep

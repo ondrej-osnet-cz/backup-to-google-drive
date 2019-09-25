@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 
 @Injectable()
@@ -67,8 +67,19 @@ export class SettingsService {
         this.sourceFolder = process.env.SOURCE_FOLDER || configData.source_folder;
 
         const pathToGoogleIds = process.env.GOOGLE_IDS_FILE || configData.googleIdsFile;
-        const googleIdsStringData = fs.readFileSync(pathToGoogleIds, 'utf8');
-        this.googleAppIdsData = JSON.parse(googleIdsStringData);
+        try {
+            const googleIdsStringData = fs.readFileSync(pathToGoogleIds, 'utf8');
+            this.googleAppIdsData = JSON.parse(googleIdsStringData);
+        } catch (err) {
+            if (err.code === 'ENOENT') {
+                throw new Error(`Google credentials file is missing: ${pathToGoogleIds}.
+                Create project at Google Developer console and download configuration:
+                - Go to this URL: https://developers.google.com/drive/api/v3/quickstart/nodejs#step_1_turn_on_the
+                - Click to the "ENABLE THE DRIVE API" button.
+                - On the dialog click on the "DOWNLOAD CLIENT CONFIGURATION" button and save the configuration to the "temp/secret" folder of project
+                (or any other location you like, but then reconfigure your ENV variable - see below or change app.config.json file)`);
+            }
+        }
 
         this.pathToGoogleTokens = process.env.PATH_TO_GOOGLE_TOKENS || configData.pathToGoogleTokens;
         this.tempCompressFilesFolder = process.env.PATH_TEMP_COMPRESS_FILE_FILDER || configData.tempCompressFilesFolder;
