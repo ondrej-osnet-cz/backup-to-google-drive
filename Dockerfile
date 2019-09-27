@@ -26,7 +26,7 @@ WORKDIR /home/node/app
 
 RUN npm install --production
 
-# runtime
+# runtimes
 # 7zip
 FROM alpine:3.10.0 as p7zip
 
