@@ -80,3 +80,32 @@ ENV NODE_ENV=production
 WORKDIR /home/node/app/dist
 
 CMD node main.js
+
+
+# tar
+FROM alpine:3.10.0 as tar_7zip
+
+RUN apk add --update tar
+RUN apk add --update p7zip
+RUN apk add --update nodejs
+
+COPY --from=builder /home/node/app/dist /home/node/app/dist
+COPY --from=dependency /home/node/app/node_modules /home/node/app/node_modules
+COPY ./app.config.json /home/node/app/dist/app.config.json
+COPY ./package.json /home/node/app/package.json
+
+RUN mkdir /home/node/data
+RUN mkdir /home/node/secret
+RUN mkdir /home/node/temp
+
+ENV SOURCE_FOLDER=/home/node/backup
+ENV GOOGLE_IDS_FILE=/home/node/secret/client_secret.json
+ENV PATH_TO_GOOGLE_TOKENS=/home/node/secret/token_secret.json
+ENV PATH_TEMP_COMPRESS_FILE_FILDER=/home/node/temp
+ENV TARGET_FOLDER_NAME=server_backup
+ENV COMPRESS_TYPE=TARBZ2
+ENV NODE_ENV=production
+
+WORKDIR /home/node/app/dist
+
+CMD node main.js
