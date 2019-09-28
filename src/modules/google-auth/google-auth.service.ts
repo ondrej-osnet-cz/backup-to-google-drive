@@ -1,5 +1,4 @@
-import { Injectable, Logger, HttpService } from '@nestjs/common';
-import * as readline from 'readline';
+import { Injectable, HttpService } from '@nestjs/common';
 import { SettingsService, GoogleTokens } from '../settings/settings.service';
 import { LoggerService } from '../logger/logger.service';
 
@@ -18,9 +17,9 @@ export class GoogleAuthService {
             const data = googleResponse.data as GoogleAuthResponseData;
             const timeOut = new Date().getTime() + parseInt(data.expires_in, 10) * 1000;
             const interval = parseInt(data.interval, 10) < 2 ? 2 : parseInt(data.interval, 10);
-            // tslint:disable-next-line: max-line-length
             this.logger.log(`\n\n\n1) Please open this URL in your browser: ${data.verification_url}\n2) Then insert this code: ${data.user_code}`);
             while (timeOut > new Date().getTime()) {
+                // check whether the user has granted permission loop
                 this.logger.debug('try google ask in interval ' + interval + 's');
                 await this.sleep(interval * 1000);
                 let url = 'https://www.googleapis.com/oauth2/v4/token?';
@@ -29,12 +28,14 @@ export class GoogleAuthService {
                 url += '&code=' + data.device_code;
                 url += '&grant_type=http://oauth.net/grant_type/device/1.0';
                 try {
+                    // if return HTTP status 200 - OK, permission granted
                     const googleCheck = await this.httpService.post(url).toPromise();
                     this.logger.log('Google permission granted!');
                     const googleData = googleCheck.data;
                     return googleData;
                 } catch (err) {
                     if (err.status === 403 || err.status === 401) {
+                        // user did not grand permission
                         throw err;
                     }
                     this.logger.debug(err.messsage);

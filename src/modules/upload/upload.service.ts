@@ -1,4 +1,4 @@
-import { Injectable, MethodNotAllowedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SettingsService } from '../settings/settings.service';
 import { LoggerService } from '../logger/logger.service';
 import { google, drive_v3 } from 'googleapis';

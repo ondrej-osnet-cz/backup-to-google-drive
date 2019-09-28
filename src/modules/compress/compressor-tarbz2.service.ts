@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { LoggerService } from '@nestjs/common';
 import * as child_process from 'child_process';
 import { CompressorBase } from './compress.service';
 
