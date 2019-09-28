@@ -9,13 +9,13 @@ export class GoogleAuthService {
     constructor(private readonly httpService: HttpService, private settings: SettingsService, private logger: LoggerService) {
     }
 
-    async getClientAuthUrl(): Promise<GoogleTokens> {
+    async authenticateGoogleDrivePermision(): Promise<GoogleTokens> {
         try {
             const client_id = this.settings.getGoogleAppIdsData().installed.client_id;
             const googleResponse = await this.httpService.post(
                 `https://accounts.google.com/o/oauth2/device/code?client_id=${client_id}&scope=https://www.googleapis.com/auth/drive.file`)
                 .toPromise();
-            const data = googleResponse.data;
+            const data = googleResponse.data as GoogleAuthResponseData;
             const timeOut = new Date().getTime() + parseInt(data.expires_in, 10) * 1000;
             const interval = parseInt(data.interval, 10) < 2 ? 2 : parseInt(data.interval, 10);
             // tslint:disable-next-line: max-line-length
@@ -52,4 +52,17 @@ export class GoogleAuthService {
         });
     }
 
+}
+
+interface GoogleAuthResponseData {
+
+    expires_in: string;
+
+    interval: string;
+
+    verification_url: string;
+
+    user_code: string;
+
+    device_code: string;
 }
