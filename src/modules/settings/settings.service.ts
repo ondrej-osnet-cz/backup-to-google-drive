@@ -77,7 +77,7 @@ export class SettingsService {
                 - Go to this URL: https://developers.google.com/drive/api/v3/quickstart/nodejs#step_1_turn_on_the
                 - Click to the "ENABLE THE DRIVE API" button.
                 - On the dialog click on the "DOWNLOAD CLIENT CONFIGURATION" button and save the configuration to the "temp/secret" folder of project
-                (or any other location you like, but then reconfigure your ENV variable - see below or change app.config.json file)`);
+                (or any other location you like, but then reconfigure your ENV variable or change app.config.json file)`);
             }
         }
 
